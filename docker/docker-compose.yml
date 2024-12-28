@@ -1,4 +1,4 @@
-
+version: '3.9'
 services:
   db:
     image: postgres:17
@@ -13,4 +13,19 @@ services:
     volumes:
       - ../sql/create_tables.sql:/docker-entrypoint-initdb.d/01_create_tables.sql
       - ../sql/insert_data.sql:/docker-entrypoint-initdb.d/02_insert_data.sql
-      - ../sql/sample_queries.sql:/docker-entrypoint-initdb.d/03_sample_queries.sql
+
+  backend:
+    build:
+      context: ../reservacion-hotel
+      dockerfile: DOCKERFILE
+    container_name: spring_boot_backend
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/test_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
